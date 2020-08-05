@@ -1,0 +1,215 @@
+<FlatButton@ButtonBehavior+Label>:
+    font_size: 14
+
+<OperatorWindow>:
+    id: main_win
+    orientation: 'vertical'
+    canvas.before:
+        Color:
+            rgba: (1, .05, .06, .05) 
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+    BoxLayout:
+        id: header
+        size_hint_y: None
+        height: 40
+        canvas.before:
+            Color:
+                rgba: (.131, .133, .255, 143)
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        FlatButton:
+            id: cur_date
+            text: ''
+            font_name: "amita-bold"
+            color: (1, 1, 1, 1)
+            size_hint_x: .2
+            
+        Label:
+            text: 'MEDICHRIS PHARMACY & STORES'
+            font_name: "amita-bold"
+            size_hint_x: .9
+            bold: True
+            color: (1, 1, 1, 1)
+        FlatButton:
+            id: loggedin_user
+            text: ''
+            font_name: "Pacifico"
+            color: (1, 1, 1, 1)
+            size_hint_x: .2
+            bold: True
+            underline: True
+            on_release: root.logout()
+
+    BoxLayout:
+        id: current
+        size_hint_y: None
+        spacing: 1
+        padding: 3
+        height: 50
+        canvas.before:
+            Color:
+                rgba: (1, 1, 1, 1)
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Button:
+            text: 'Current Item:'
+            background_normal: ''
+            background_color: (.06, .45, .50, 1)
+            size_hint_x: .4
+        Button:
+            id: cur_product
+            text: 'Default Product'
+            background_normal: ''
+            background_color: (.06, .45, .50, 1)
+        Button:
+            id: cur_price
+            text: '0.00'
+            background_normal: ''
+            background_color: (.06, .45, .50, 1)
+            size_hint_x: .2
+        Button:
+            id: refresh
+            text: 'CLOUD'
+            background_normal: ''
+            background_color: (.06, .50, .50, 1)
+            size_hint_x: .2
+            bold: True
+            
+        Button:
+            id: refresh
+            text: 'SELL'
+            background_normal: ''
+            background_color: (.255, .99, .71, 255)
+            size_hint_x: .2
+            bold: True
+            on_release: root.test()
+
+
+    BoxLayout:
+        padding: 5
+        BoxLayout:
+            id: product_details
+            orientation: 'vertical'
+            size_hint_x: .8
+            spacing: 4
+
+            BoxLayout:
+                id: product_labels
+                size_hint_y: None
+                height: 40
+                canvas.before:
+                    Color:
+                        rgba: (.06, .45, .50, 1)
+                    Rectangle:
+                        size: self.size
+                        pos: self.pos
+                FlatButton:
+                    text: 'Qty'
+                    size_hint_x: .05
+                FlatButton:
+                    text: 'Product name'
+                    size_hint_x: .3
+                FlatButton:
+                    text: 'Price'
+                    size_hint_x: .05
+                FlatButton:
+                    text: 'Product Total'
+                    size_hint_x: .2
+                FlatButton:
+                    text: ' '
+                    size_hint_x: .35
+
+            BoxLayout:
+                id: product_inputs
+                size_hint_y: None
+                height: 30
+                spacing: 5
+                TextInput:
+                    id: qty_inp
+                    size_hint_x: .05
+                    input_filter: 'int'
+                    multiline: False
+                    on_text_validate: code_inp.focus = True
+                TextInput:
+                    id: code_inp
+                    size_hint_x: .3
+                    multiline: False
+                    on_text_validate: root.update_purchases()
+                TextInput:
+                    id: price_inp
+                    size_hint_x: .05
+                TextInput:
+                    id: total_inp
+                    size_hint_x: .2
+                Spinner:
+                    id: target_product
+                    text: 'Choose Product'
+                    size_hint_x: .35
+                    on_state: root.filter_ana()
+            BoxLayout:
+                id: id_to_cart
+                orientation: 'vertical'
+                BoxLayout:
+                    size_hint_y: None
+                    height: 30
+                    canvas.before:
+                        Color:
+                            rgba: (.06, .45, .50, 1)
+                        Rectangle:
+                            size: self.size
+                            pos: self.pos
+                    Label:
+                        text: 'Code'
+                        size_hint_x: .2
+                    Label:
+                        text: 'Product name'
+                        size_hint_x: .3
+                    Label:
+                        text: 'Qty'
+                        size_hint_x: .1
+                    Label:
+                        text: 'Price'
+                        size_hint_x: .1
+                    Label:
+                        text: 'Product total'
+                        size_hint_x: .2
+                    Label:
+                        text: ''
+                        size_hint_x: .1
+
+                GridLayout:
+                    id: products
+                    cols: 1
+
+        BoxLayout:
+            id: preview
+            orientation: 'vertical'
+            size_hint_x: .2
+
+            TextInput:
+                id: receipt_preview
+                readonly: True
+                text: '\t\t\tMEDICHRIS PHARMACY $ STORES\n123 Str\nAbakpa, Enugu\n\nTel: +234\nEmail: pamela@medichris.com\nReceipt no: \nDate: \n\n'
+                bold: True
+        
+
+    BoxLayout:
+        id: footer
+        size_hint_y: None
+        # size_hint_x: 1
+        height: 30
+        canvas.before:
+            Color:
+                rgba: (.131, .133, .255, 143)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        Label:
+            text: "Developer's contact: +234(0)8120322345 || ngwustephen99@gmail.com"
+            font_name: "Amita-bold"
+            bold: True

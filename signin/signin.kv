@@ -1,0 +1,83 @@
+#: import Window kivy.core.window.Window
+
+<FlatButton@ButtonBehavior+Label>:
+    font_size: 16
+
+<SigninWindow>:
+    id: main_win
+    orientation: 'vertical'
+    spacing: 10
+    space_x: self.size[0]/3
+    canvas.before:
+        Color:
+            rgba: (1, 1, 1, 1)
+        Rectangle:
+            size: self.size
+            pos: self.pos
+
+    BoxLayout:
+        size_hint_y: None
+        height: 50
+        canvas.before:
+            Color:
+                rgba: (.131, .133, .255, 143)
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        Label:
+            text: 'MEDICHRIS PHARMACY & STORES'
+            font_name: 'alpha'
+            bold: True
+            size_hint_x: .9
+        FlatButton:
+            text: 'close'
+            font_name: 'amerika'
+            underline: True
+            size_hint_x: .1
+            on_release: Window.close()
+    BoxLayout:
+        orientation: 'vertical'
+        padding: main_win.space_x, 10
+        # spacing: 20
+        BoxLayout:
+            orientation: 'vertical'
+            spacing: 10
+            size_hint_y: None
+            height: 120
+            Label:
+                id: info
+                text: ''
+                markup: True
+                size_hint_y: None
+                height: 20
+            TextInput:
+                id: username_field
+                hint_text: 'Username'
+                font_name: 'amita-bold'
+                multiline: False
+                size_hint_y: 5
+                focus: True
+                on_text_validate: pwd_field.focus = True
+            TextInput:
+                id: pwd_field
+                hint_text: 'Password'
+                font_name: 'amita-bold'
+                multiline: False
+                size_hint_y: 5
+                password: True
+                on_text_validate: root.validate_user()
+        Label:
+            id: sp
+            size_hint_y: None
+            height: 40
+        Button:
+            text: 'Sign In'
+            font_name: "amerika"
+            size_hint_y: None
+            height: 40
+            background_color: (.131, .133, .255, 143)
+            background_normal: ''
+            on_release: root.validate_user()
+        Label:
+            id: sp2
+
