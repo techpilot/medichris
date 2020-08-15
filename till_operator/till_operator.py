@@ -14,6 +14,8 @@ from datetime import datetime
 from datetime import date
 import math
 import random
+import http.client as httplib
+
 
 Builder.load_file('till_operator/operator.kv')
 
@@ -28,12 +30,14 @@ class Notify(ModalView):
 class OperatorWindow(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
+        # local db connection
         client = MongoClient()
         self.db = client.db
-        self.db_ana = client.pos
         self.stocks = self.db.stocks
-        self.analysis = self.db_ana.posone
+        self.analysis = self.db.analysis
 
+        # LOCAL DB LIST
         self.cart = []
         self.qty = []
         self.instock = []
@@ -42,8 +46,17 @@ class OperatorWindow(BoxLayout):
         self.dbSold = []
         self.total_list = []
         self.ana_price_list = []
-        # self.ana_disc_list = []
-        self.total = 0.00  # self.ids.qty_inp.text
+        self.totaled = []
+        self.totaled_out = []
+
+        # CLOUD DB LIST
+        self.cloud_cart = []
+        self.cloud_qty = []
+        self.cloud_price = []
+        self.cloud_date = []
+
+        # Total
+        self.total = 0.00
 
         self.notify = Notify()
 
@@ -88,7 +101,7 @@ class OperatorWindow(BoxLayout):
         products_container = self.ids.products
 
         self.target_code = self.stocks.find_one(
-            {'product_name': self.pcode})  # 'product_code'
+            {'product_name': self.pcode})
         if self.target_code == None or not self.target_code:
             self.notify.add_widget(
                 Label(text='[color=#FF0000][b]Product Name Empty or Incorrect[/b][/color]', markup=True))
@@ -107,8 +120,6 @@ class OperatorWindow(BoxLayout):
                          size_hint_x=.3, color=(.06, .45, .45, 1))
             qty = Label(text=str(self.ids.qty_inp.text),
                         size_hint_x=.1, color=(.06, .45, .45, 1))
-            # disc = Label(text=str(self.ids.disc_inp.text),
-            #  size_hint_x=.1, color=(.06, .45, .45, 1))
             price = Label(
                 text=str(self.target_code['product_price']), size_hint_x=.1, color=(.06, .45, .45, 1))
 
@@ -120,7 +131,6 @@ class OperatorWindow(BoxLayout):
             self.details.add_widget(code)
             self.details.add_widget(name)
             self.details.add_widget(qty)
-            # self.details.add_widget(disc)
             self.details.add_widget(price)
             self.details.add_widget(self.total1)
             self.details.add_widget(undo)
@@ -131,9 +141,10 @@ class OperatorWindow(BoxLayout):
             pqty = str(self.ids.qty_inp.text)
 
             self.total += pprice
+            self.totaled.append(pprice)
+            self.totaled_out.append(sum(self.totaled))
+            print('total', self.totaled_out[-1])
 
-            purchase_total = '`\n\nTotal\t\t\t\t\t\t\t\t\t\t\t' + \
-                str(self.total)
             self.ids.cur_product.text = pname
             self.ids.cur_price.text = str(pprice)
             preview = self.ids.receipt_preview
@@ -146,16 +157,33 @@ class OperatorWindow(BoxLayout):
             getSold = self.target_code['sold']
             anaPrice = self.target_code['product_price']
 
+            # LOCAL LIST APPEMD
             self.cart.append(self.pcode)
-            self.qty.append(self.ids.qty_inp.text)  # 1
+            self.qty.append(self.ids.qty_inp.text)
             self.instock.append(getStock)
             self.sold.append(getSold)
             self.ana_price_list.append(anaPrice)
             self.total_list.append(self.total1.text)
 
+            # CLOUD LIST APPEND
+            self.cloud_cart.append(self.pcode)
+            self.cloud_qty.append(self.ids.qty_inp.text)
+            self.cloud_price.append(anaPrice)
+            self.cloud_date.append(str(datetime.now())[:10])
+
+            print('cloud ', self.cloud_cart)
+
             nu_preview = '\n'.join(
-                [prev_text, pname+'\tx'+pqty+'\t'+str(price.text), purchase_total])
+                [prev_text])
             preview.text = nu_preview
+
+            # TOTAL DISPLAY
+            self.ids.label_preview.clear_widgets()
+
+            deSales = Label(text=str(self.totaled_out[-1]), font_name='alpha', size_hint_x=.2,
+                            bold=True, color=(.06, .45, .45, 1))
+
+            self.ids.label_preview.add_widget(deSales)
 
             print(self.cart)
             print(self.qty)
@@ -174,13 +202,17 @@ class OperatorWindow(BoxLayout):
                 del self.instock[k]
                 del self.sold[k]
                 del self.total_list[k]
-        print(self.cart)
-        print(self.qty)
-        print(self.instock)
-        print(self.sold)
+                del self.totaled[k]
+                del self.totaled_out[k]
+
+                del self.cloud_cart[k]
+                del self.cloud_qty[k]
+                del self.cloud_price[k]
+                del self.cloud_date[k]
+
+    # LOCAL DB UPDATE
 
     def test(self):
-        # UPDATE PRODUCT DB
         if len(self.cart) == 0 or len(self.cart) != len(self.qty) or len(self.cart) != len(self.instock) or len(self.cart) != len(self.sold):
             self.notify.add_widget(
                 Label(text='[color=#FF0000][b]Nothing to sell[/b][/color]', markup=True))
@@ -204,7 +236,6 @@ class OperatorWindow(BoxLayout):
                 self.stocks.update_one({'product_name': self.cart[j]}, {
                     '$set': {'sold': self.dbSold[j]}})
                 print('sold upd: ', self.dbSold[j])
-                # self.cart[j]
 
             for i in range(len(self.cart)):
                 self.analysis.insert_one({'product_name': self.cart[i], 'product_qty': self.qty[i], 'price': self.ana_price_list[i], 'date': str(datetime.now())[
@@ -224,8 +255,55 @@ class OperatorWindow(BoxLayout):
             del self.ana_price_list[::]
             del self.total_list[::]
 
+            del self.totaled[::]
+            del self.totaled_out[::]
+
             self.ids.products.clear_widgets()
-            # self.ids.receipt_preview.text.clear_widgets()
+
+    # CLOUD DB UPDATE
+    def cloud(self, url="www.cloud.mongodb.com", timeout=3):
+        conn = httplib.HTTPSConnection(url, timeout=timeout)
+        try:
+            conn.request("HEAD", "/")
+            # cloud db connection
+            cloud_client = MongoClient(
+                "mongodb+srv://cipher:cipher0@cluster0-crb4g.mongodb.net/<dbname>?retryWrites=true&w=majority")
+
+            self.cloud_db = cloud_client.get_database('medichris')
+            self.cloud_records = self.cloud_db.analysis
+            for i in range(len(self.cloud_cart)):
+                self.cloud_records.insert_one(
+                    {'product name': self.cloud_cart[i], 'quantity': self.cloud_qty[i], 'price': self.cloud_price[i], 'date': self.cloud_date[i]})
+
+            print(self.cloud_cart)
+
+            del self.cloud_cart[::]
+            del self.cloud_qty[::]
+            del self.cloud_price[::]
+            del self.cloud_date[::]
+
+            conn.close()
+            return True
+        except Exception as e:
+            print(e)
+            return False
+
+    # Cancels Sales
+    def cancel(self):
+        del self.cart[::]
+        del self.qty[::]
+        del self.instock[::]
+        del self.sold[::]
+        del self.dbStock[::]
+        del self.dbSold[::]
+        del self.ana_price_list[::]
+        del self.total_list[::]
+
+        del self.totaled[::]
+        del self.totaled_out[::]
+
+        self.ids.products.clear_widgets()
+        self.ids.label_preview.clear_widgets()
 
     def get_products(self):
         client = MongoClient()
@@ -273,8 +351,8 @@ class OperatorWindow(BoxLayout):
 
     def get_analysis(self):
         client = MongoClient()
-        db_ana = client.pos
-        analysis = db_ana.posone
+        db_ana = client.db
+        analysis = db_ana.analysis
         _sold = OrderedDict()
         _sold['product_name'] = {}
         _sold['product_qty'] = {}

@@ -17,9 +17,7 @@ from datetime import datetime
 import hashlib
 import math
 import random
-# import pandas as pd
-# import matplotlib.pyplot as plt
-# from kivy.garden.matplotlib.backend_kivyagg import FigureCanvasKivyAgg as FCK
+
 
 Builder.load_file('admin/admin.kv')
 
@@ -36,10 +34,10 @@ class AdminWindow(BoxLayout):
         super().__init__(**kwargs)
         client = MongoClient()
         db = client.db
-        db_ana = client.pos
+
         self.users = db.users
         self.products = db.stocks
-        self.analysis = db_ana.posone
+        self.analysis = db.analysis
         self.notify = Notify()
 
         # Display users
@@ -114,7 +112,6 @@ class AdminWindow(BoxLayout):
         target = self.ids.ops_fields_p
         target.clear_widgets()
 
-        # crud_code = TextInput(hint_text='Product Code', multiline=False)
         crud_name = TextInput(hint_text='Product Name', multiline=False)
         crud_price = TextInput(hint_text='Price(Naira)',
                                multiline=False, input_filter='float')
@@ -122,16 +119,13 @@ class AdminWindow(BoxLayout):
                                multiline=False, input_filter='int')
         crud_sold = TextInput(hint_text='Sold(qty)',
                               multiline=False, input_filter='int')
-        # crud_order = TextInput(hint_text='Order(Date)', multiline=False)
         crud_submit = Button(text='Add', background_color=(.255, .99, .71, 6), size_hint_x=None, width=100, on_release=lambda x: self.add_product(
             crud_name.text, crud_price.text, crud_stock.text, crud_sold.text))
 
-        # target.add_widget(crud_code)
         target.add_widget(crud_name)
         target.add_widget(crud_price)
         target.add_widget(crud_stock)
         target.add_widget(crud_sold)
-        # target.add_widget(crud_order)
         target.add_widget(crud_submit)
 
     # ADD FUNCTIONS
@@ -204,7 +198,6 @@ class AdminWindow(BoxLayout):
                                multiline=False, input_filter='int')
         crud_sold = TextInput(hint_text='Sold(qty)',
                               multiline=False, input_filter='int')
-        # crud_order = TextInput(hint_text='Order(Date)', multiline=False)
         crud_submit = Button(text='Update', size_hint_x=None, width=100, on_release=lambda x: self.update_product(
             crud_code.text, crud_name.text, crud_price.text, crud_stock.text, crud_sold.text))
 
@@ -213,7 +206,6 @@ class AdminWindow(BoxLayout):
         target.add_widget(crud_price)
         target.add_widget(crud_stock)
         target.add_widget(crud_sold)
-        # target.add_widget(crud_order)
         target.add_widget(crud_submit)
 
     # UPDATE FUNCTIONS
@@ -227,7 +219,6 @@ class AdminWindow(BoxLayout):
             self.notify.open()
             Clock.schedule_once(self.killswitch, 1)
         else:
-            # user = self.users.find_one({'user_name':user})
             self.users.update_one({'user_name': user}, {'$set': {'first_name': first, 'last_name': last,
                                                                  'user_name': user, 'password': pwd, 'designation': des, 'date': datetime.now()}})
 
@@ -375,8 +366,8 @@ class AdminWindow(BoxLayout):
         content.clear_widgets()
 
         client = MongoClient()
-        db_ana = client.pos
-        analysis = db_ana.posone
+        db_ana = client.db
+        analysis = db_ana.analysis
         _sold = OrderedDict()
         _sold['total'] = {}
         _sold['sales_date'] = {}
@@ -395,10 +386,6 @@ class AdminWindow(BoxLayout):
                         bold=True, color=(.06, .45, .45, 1))
 
         self.ids.analysis_res.add_widget(deSales)
-
-        # analyse = self.monthd_stats()
-        # ana_table = DataTable(table=analyse)
-        # content.add_widget(ana_table)
 
     def get_users(self):
         client = MongoClient()
@@ -424,7 +411,7 @@ class AdminWindow(BoxLayout):
                 pwd = pwd[:8] + '...'
             passwords.append(pwd)
             designations.append(user['designation'])
-        # print(designations)
+
         users_length = len(first_names)
         idx = 0
         while idx < users_length:
@@ -485,8 +472,8 @@ class AdminWindow(BoxLayout):
     # PRODUCT ANALYSIS
     def get_analysis(self):
         client = MongoClient()
-        db_ana = client.pos
-        analysis = db_ana.posone
+        db_ana = client.db
+        analysis = db_ana.analysis
         _sold = OrderedDict()
         _sold['code'] = {}
         _sold['product_name'] = {}
@@ -512,7 +499,6 @@ class AdminWindow(BoxLayout):
             price.append(analyse['price'])
             date.append(analyse['sales_date'])
             time.append(analyse['time'])
-        # print(date)
 
         analysis_length = len(self.product_name)
         idx = 0
@@ -526,16 +512,13 @@ class AdminWindow(BoxLayout):
 
             idx += 1
 
-        # db_ana.posone.find({}).sort('date', pymongo.DESCENDING)
-        # print(db_ana.posone.find({}))
-
         return _sold
 
     # PRODUCT STATS FILTERS
     def dated_stats(self):
         client = MongoClient()
-        db_ana = client.pos
-        analysis = db_ana.posone
+        db_ana = client.db
+        analysis = db_ana.analysis
         _sold = OrderedDict()
         _sold['code'] = {}
         _sold['product_name'] = {}
@@ -561,7 +544,6 @@ class AdminWindow(BoxLayout):
             price.append(analyse['price'])
             sales_date.append(analyse['sales_date'])
             time.append(analyse['time'])
-        # print(date)
 
         analysis_length = len(product_name)
         idx = 0
@@ -580,8 +562,8 @@ class AdminWindow(BoxLayout):
     def monthd_stats(self):
 
         client = MongoClient()
-        db_ana = client.pos
-        analysis = db_ana.posone
+        db_ana = client.db
+        analysis = db_ana.analysis
         _sold = OrderedDict()
         _sold['code'] = {}
         _sold['product_name'] = {}
@@ -607,7 +589,6 @@ class AdminWindow(BoxLayout):
             price.append(analyse['price'])
             sales_date.append(analyse['sales_date'])
             time.append(analyse['time'])
-        # print(date)
 
         analysis_length = len(product_name)
         idx = 0
@@ -628,8 +609,8 @@ class AdminWindow(BoxLayout):
         name = target_product[:target_product.find(' | ')]
 
         client = MongoClient()
-        db_ana = client.pos
-        analysis = db_ana.posone
+        db_ana = client.db
+        analysis = db_ana.analysis
         _sold = OrderedDict()
         _sold['code'] = {}
         _sold['product_name'] = {}
@@ -655,7 +636,6 @@ class AdminWindow(BoxLayout):
             price.append(analyse['price'])
             sales_date.append(analyse['sales_date'])
             time.append(analyse['time'])
-        # print(date)
 
         analysis_length = len(product_name)
         idx = 0
@@ -672,7 +652,7 @@ class AdminWindow(BoxLayout):
         return _sold
 
     def view_stats(self):
-        # plt.cla()
+
         self.ids.analysis_res.clear_widgets()
 
         analysis_scrn = self.ids.analysis_res
