@@ -76,7 +76,7 @@
             id: refresh
             text: 'CLOUD'
             background_normal: ''
-            background_color: (.06, .50, .50, 1)
+            background_color: (0, 0, 1, 1)
             size_hint_x: .2
             bold: True
             on_release: root.cloud()
@@ -150,6 +150,7 @@
                 Spinner:
                     id: target_product
                     text: 'Choose Product'
+                    background_color: (.06, .50, .50, 1)
                     size_hint_x: .35
                     on_state: root.filter_ana()
             BoxLayout:
@@ -185,7 +186,7 @@
                         text: 'Cancel'
                         bold: True
                         size_hint_x: .1
-                        background_color: (.06, .45, .45, 1) 
+                        background_color: (1, 0, 0, 1) 
                         on_release: root.cancel()
 
                 GridLayout:

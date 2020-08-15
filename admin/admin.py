@@ -8,6 +8,7 @@ from kivy.clock import Clock
 from kivy.uix.modalview import ModalView
 from kivy.lang import Builder
 from kivy.core.text import LabelBase
+from kivy.graphics import Color
 
 from collections import OrderedDict
 import pymongo
@@ -98,7 +99,7 @@ class AdminWindow(BoxLayout):
         crud_pwd = TextInput(hint_text='Password', multiline=False)
         crud_des = Spinner(text='Operator', values=[
                            'Operator', 'Administrator'])
-        crud_submit = Button(text='Add', background_color=(.255, .99, .71, 6), size_hint_x=None, width=100, on_release=lambda x: self.add_user(
+        crud_submit = Button(text='Add', background_color=(0, 1, 0, 1), size_hint_x=None, width=100, on_release=lambda x: self.add_user(
             crud_first.text, crud_last.text, crud_user.text, crud_pwd.text, crud_des.text))
 
         target.add_widget(crud_first)
@@ -119,7 +120,7 @@ class AdminWindow(BoxLayout):
                                multiline=False, input_filter='int')
         crud_sold = TextInput(hint_text='Sold(qty)',
                               multiline=False, input_filter='int')
-        crud_submit = Button(text='Add', background_color=(.255, .99, .71, 6), size_hint_x=None, width=100, on_release=lambda x: self.add_product(
+        crud_submit = Button(text='Add', background_color=(0, 1, 0, 1), size_hint_x=None, width=100, on_release=lambda x: self.add_product(
             crud_name.text, crud_price.text, crud_stock.text, crud_sold.text))
 
         target.add_widget(crud_name)
@@ -176,7 +177,7 @@ class AdminWindow(BoxLayout):
         crud_pwd = TextInput(hint_text='Password', multiline=False)
         crud_des = Spinner(text='Operator', values=[
                            'Operator', 'Administrator'])
-        crud_submit = Button(text='Update', size_hint_x=None, width=100, on_release=lambda x: self.update_user(
+        crud_submit = Button(text='Update', background_color=(0, 0, 1, 1), size_hint_x=None, width=100, on_release=lambda x: self.update_user(
             crud_first.text, crud_last.text, crud_user.text, crud_pwd.text, crud_des.text))
 
         target.add_widget(crud_first)
@@ -198,7 +199,7 @@ class AdminWindow(BoxLayout):
                                multiline=False, input_filter='int')
         crud_sold = TextInput(hint_text='Sold(qty)',
                               multiline=False, input_filter='int')
-        crud_submit = Button(text='Update', size_hint_x=None, width=100, on_release=lambda x: self.update_product(
+        crud_submit = Button(text='Update', background_color=(0, 0, 1, 1), size_hint_x=None, width=100, on_release=lambda x: self.update_product(
             crud_code.text, crud_name.text, crud_price.text, crud_stock.text, crud_sold.text))
 
         target.add_widget(crud_code)
@@ -248,7 +249,7 @@ class AdminWindow(BoxLayout):
         target.clear_widgets()
         crud_user = TextInput(
             hint_text='Username', multiline=False)
-        crud_submit = Button(text='Delete', background_color=(.255, .50, .50, 1), size_hint_x=None, width=100,
+        crud_submit = Button(text='Delete', background_color=(1, 0, 0, 1), size_hint_x=None, width=100,
                              on_release=lambda x: self.remove_user(crud_user.text))
 
         target.add_widget(crud_user)
@@ -258,7 +259,7 @@ class AdminWindow(BoxLayout):
         target = self.ids.ops_fields_p
         target.clear_widgets()
         crud_code = TextInput(hint_text='Product Code', multiline=False)
-        crud_submit = Button(text='Delete', background_color=(.255, .99, .71, 6), size_hint_x=None, width=100,
+        crud_submit = Button(text='Delete', background_color=(1, 0, 0, 1), size_hint_x=None, width=100,
                              on_release=lambda x: self.remove_product(crud_code.text))
 
         target.add_widget(crud_code)
@@ -268,7 +269,7 @@ class AdminWindow(BoxLayout):
         target = self.ids.ops_fields_a
         target.clear_widgets()
         crud_code = TextInput(hint_text='Enter Code', multiline=False)
-        crud_submit = Button(text='Delete', size_hint_x=None, width=100,
+        crud_submit = Button(text='Delete', background_color=(1, 0, 0, 1), size_hint_x=None, width=100,
                              on_release=lambda x: self.remove_analysis(crud_code.text))
 
         target.add_widget(crud_code)
@@ -319,7 +320,7 @@ class AdminWindow(BoxLayout):
         target = self.ids.ops_fields_a
         target.clear_widgets()
         self.crud_date = TextInput(hint_text='Date', multiline=False)
-        crud_submit = Button(text='Day Stats', size_hint_x=None, width=100,
+        crud_submit = Button(text='Day Stats', background_color=(0, 0, 1, 1), size_hint_x=None, width=100,
                              on_release=lambda x: self.dated_analysis())
 
         target.add_widget(self.crud_date)
@@ -329,7 +330,7 @@ class AdminWindow(BoxLayout):
         target = self.ids.ops_fields_a
         target.clear_widgets()
         self.crud_month = TextInput(hint_text='Month', multiline=False)
-        crud_submit = Button(text='Month Stats', size_hint_x=None, width=100,
+        crud_submit = Button(text='Month Stats', background_color=(0, 0, 1, 1), size_hint_x=None, width=100,
                              on_release=lambda x: self.monthd_analysis())
 
         target.add_widget(self.crud_month)
@@ -339,7 +340,7 @@ class AdminWindow(BoxLayout):
         target = self.ids.ops_fields_a
         target.clear_widgets()
         self.crud_day = TextInput(hint_text='Input Date', multiline=False)
-        crud_submit = Button(text='Sales', size_hint_x=None, width=100,
+        crud_submit = Button(text='Sales', background_color=(1, 0, 1, 1), size_hint_x=None, width=100,
                              on_release=lambda x: self.daily_sales())
 
         target.add_widget(self.crud_day)
