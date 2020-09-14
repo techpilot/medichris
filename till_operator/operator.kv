@@ -58,6 +58,7 @@
                 pos: self.pos
         Button:
             text: 'Current Item:'
+            bold: True
             background_normal: ''
             background_color: (.06, .45, .50, 1)
             size_hint_x: .4
@@ -79,7 +80,7 @@
             background_color: (0, 0, 1, 1)
             size_hint_x: .2
             bold: True
-            on_release: root.cloud()
+        
             
         Button:
             id: refresh
@@ -111,16 +112,20 @@
                         pos: self.pos
                 FlatButton:
                     text: 'Qty'
+                    bold: True
                     size_hint_x: .05
                 FlatButton:
                     text: 'Product name'
-                    size_hint_x: .3
+                    bold: True
+                    size_hint_x: .25
                 FlatButton:
                     text: 'Price'
+                    bold: True
                     size_hint_x: .05
                 FlatButton:
                     text: 'Product Total'
-                    size_hint_x: .2
+                    bold: True
+                    size_hint_x: .15
                 FlatButton:
                     text: ' '
                     size_hint_x: .35
@@ -167,20 +172,31 @@
                             pos: self.pos
                     Label:
                         text: 'Code'
-                        size_hint_x: .2
+                        bold: True
+                        size_hint_x: .1
                     Label:
                         text: 'Product name'
+                        bold: True
                         size_hint_x: .3
                     Label:
                         text: 'Qty'
+                        bold: True
                         size_hint_x: .1
                     Label:
                         text: 'Price'
+                        bold: True
                         size_hint_x: .1
                     Label:
                         text: 'Product total'
-                        size_hint_x: .2
-                    
+                        bold: True
+                        size_hint_x: .15
+                    Button:
+                        id: undo
+                        text: 'Remove Last'
+                        size_hint_x: .15
+                        background_color: (1, 0, 0, 1)
+                        on_release: root.updateList()
+                        
                     Button:
                         id: cancel
                         text: 'Cancel'

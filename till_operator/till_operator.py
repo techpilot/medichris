@@ -49,12 +49,6 @@ class OperatorWindow(BoxLayout):
         self.totaled = []
         self.totaled_out = []
 
-        # CLOUD DB LIST
-        self.cloud_cart = []
-        self.cloud_qty = []
-        self.cloud_price = []
-        self.cloud_date = []
-
         # Total
         self.total = 0.00
 
@@ -92,8 +86,9 @@ class OperatorWindow(BoxLayout):
         digits = "012345678957083"
         OTP = ""
 
-        for i in range(7):
+        for i in range(6):
             OTP += digits[math.floor(random.random() * 15)]
+            # print(i)
         return OTP
 
     def update_purchases(self):
@@ -102,116 +97,133 @@ class OperatorWindow(BoxLayout):
 
         self.target_code = self.stocks.find_one(
             {'product_name': self.pcode})
-        if self.target_code == None or not self.target_code:
+        if self.ids.qty_inp.text == '':
             self.notify.add_widget(
-                Label(text='[color=#FF0000][b]Product Name Empty or Incorrect[/b][/color]', markup=True))
+                Label(text='[color=#FF0000][b]Quantity is needed[/b][/color]', markup=True))
+            self.notify.open()
+            Clock.schedule_once(self.killswitch, 1)
+        else:
+            if self.target_code == None or not self.target_code:
+                self.notify.add_widget(
+                    Label(text='[color=#FF0000][b]Product Name Empty or Incorrect[/b][/color]', markup=True))
+                self.notify.open()
+                Clock.schedule_once(self.killswitch, 1)
+
+            else:
+                self.details = BoxLayout(size_hint_y=None, height=30,
+                                         pos_hint={'top': 1})
+
+                products_container.add_widget(self.details)
+
+                code = Label(text=self.target_code['product_code'], size_hint_x=.1,
+                             color=(.06, .45, .45, 1))
+                name = Label(text=self.pcode, bold=True,
+                             size_hint_x=.3, color=(.06, .45, .45, 1))
+                qty = Label(text=str(self.ids.qty_inp.text),
+                            size_hint_x=.1, color=(.06, .45, .45, 1))
+                price = Label(
+                    text=str(self.target_code['product_price']), size_hint_x=.1, color=(.06, .45, .45, 1))
+
+                self.total1 = Label(text=str(float(price.text) * int(self.ids.qty_inp.text)), size_hint_x=.15,
+                                    color=(.06, .45, .45, 1))
+                undo = Label(
+                    text='Added', color=(.06, .45, .45, 1), size_hint_x=.25)
+
+                self.details.add_widget(code)
+                self.details.add_widget(name)
+                self.details.add_widget(qty)
+                self.details.add_widget(price)
+                self.details.add_widget(self.total1)
+                self.details.add_widget(undo)
+
+                # Update Preview
+                pname = name.text
+                pprice = float(price.text) * int(self.ids.qty_inp.text)
+                pqty = str(self.ids.qty_inp.text)
+
+                self.total += pprice
+                self.totaled.append(pprice)
+                self.totaled_out.append(sum(self.totaled))
+                print('total', self.totaled_out[-1])
+
+                self.ids.cur_product.text = pname
+                self.ids.cur_price.text = str(pprice)
+                preview = self.ids.receipt_preview
+                prev_text = preview.text
+                _prev = prev_text.find('`')
+                if _prev > 0:
+                    prev_text = prev_text[:_prev]
+
+                getStock = self.target_code['in_stock']
+                getSold = self.target_code['sold']
+                anaPrice = self.target_code['product_price']
+
+                # LOCAL LIST APPEMD
+                self.cart.append(self.pcode)
+                self.qty.append(self.ids.qty_inp.text)
+                self.instock.append(getStock)
+                self.sold.append(getSold)
+                self.ana_price_list.append(anaPrice)
+                self.total_list.append(self.total1.text)
+
+                nu_preview = '\n'.join(
+                    [prev_text])
+                preview.text = nu_preview
+
+                # TOTAL DISPLAY
+                self.ids.label_preview.clear_widgets()
+
+                deSales = Label(text=str(self.totaled_out[-1]), font_name='alpha', size_hint_x=.2,
+                                bold=True, color=(.06, .45, .45, 1))
+
+                self.ids.label_preview.add_widget(deSales)
+
+                print(self.cart)
+                print(self.qty)
+                print(self.instock)
+                print(self.sold)
+
+                self.ids.qty_inp.text = str(pqty)
+                self.ids.price_inp.text = str(price.text)
+                self.ids.total_inp.text = str(pprice)
+
+    def updateList(self):
+        if len(self.cart) == 0:
+            print('Self.cart is empty')
+            pass
+        else:
+            del self.cart[-1]
+            del self.qty[-1]
+            del self.instock[-1]
+            del self.sold[-1]
+            del self.ana_price_list[-1]
+            del self.total_list[-1]
+            del self.totaled[-1]
+            del self.totaled_out[-1]
+
+            self.ids.products.remove_widget(self.ids.products.children[0])
+
+            self.ids.label_preview.clear_widgets()
+
+            if len(self.totaled_out) == 0:
+                print('Empty List')
+                pass
+            else:
+                deSales = Label(text=str(self.totaled_out[-1]), font_name='alpha', size_hint_x=.2,
+                                bold=True, color=(.06, .45, .45, 1))
+
+                self.ids.label_preview.add_widget(deSales)
+
+            print('totAL', self.totaled)
+            print('REMAINING: ', self.totaled_out)
+            print('Price List: ', self.ana_price_list)
+
+            self.notify.add_widget(
+                Label(text='[color=#00FF00][b]Last Product Removed!![/b][/color]', markup=True))
             self.notify.open()
             Clock.schedule_once(self.killswitch, 1)
 
-        else:
-            self.details = BoxLayout(size_hint_y=None, height=30,
-                                     pos_hint={'top': 1})
-
-            products_container.add_widget(self.details)
-
-            code = Label(text=self.target_code['product_code'], size_hint_x=.2,
-                         bold=True, color=(.06, .45, .45, 1))
-            name = Label(text=self.pcode,
-                         size_hint_x=.3, color=(.06, .45, .45, 1))
-            qty = Label(text=str(self.ids.qty_inp.text),
-                        size_hint_x=.1, color=(.06, .45, .45, 1))
-            price = Label(
-                text=str(self.target_code['product_price']), size_hint_x=.1, color=(.06, .45, .45, 1))
-
-            self.total1 = Label(text=str(float(price.text) * int(self.ids.qty_inp.text)), size_hint_x=.2,
-                                color=(.06, .45, .45, 1))
-            undo = Button(text='remove', size_hint_x=.1, background_color=(.06, .45, .50, 1), on_release=lambda x: (self.details.remove_widget(code), self.details.remove_widget(name), self.details.remove_widget(
-                qty), self.details.remove_widget(price), self.details.remove_widget(self.total1), self.details.remove_widget(undo), self.updateList(self.pcode)))
-
-            self.details.add_widget(code)
-            self.details.add_widget(name)
-            self.details.add_widget(qty)
-            self.details.add_widget(price)
-            self.details.add_widget(self.total1)
-            self.details.add_widget(undo)
-
-            # Update Preview
-            pname = name.text
-            pprice = float(price.text) * int(self.ids.qty_inp.text)
-            pqty = str(self.ids.qty_inp.text)
-
-            self.total += pprice
-            self.totaled.append(pprice)
-            self.totaled_out.append(sum(self.totaled))
-            print('total', self.totaled_out[-1])
-
-            self.ids.cur_product.text = pname
-            self.ids.cur_price.text = str(pprice)
-            preview = self.ids.receipt_preview
-            prev_text = preview.text
-            _prev = prev_text.find('`')
-            if _prev > 0:
-                prev_text = prev_text[:_prev]
-
-            getStock = self.target_code['in_stock']
-            getSold = self.target_code['sold']
-            anaPrice = self.target_code['product_price']
-
-            # LOCAL LIST APPEMD
-            self.cart.append(self.pcode)
-            self.qty.append(self.ids.qty_inp.text)
-            self.instock.append(getStock)
-            self.sold.append(getSold)
-            self.ana_price_list.append(anaPrice)
-            self.total_list.append(self.total1.text)
-
-            # CLOUD LIST APPEND
-            self.cloud_cart.append(self.pcode)
-            self.cloud_qty.append(self.ids.qty_inp.text)
-            self.cloud_price.append(anaPrice)
-            self.cloud_date.append(str(datetime.now())[:10])
-
-            print('cloud ', self.cloud_cart)
-
-            nu_preview = '\n'.join(
-                [prev_text])
-            preview.text = nu_preview
-
-            # TOTAL DISPLAY
-            self.ids.label_preview.clear_widgets()
-
-            deSales = Label(text=str(self.totaled_out[-1]), font_name='alpha', size_hint_x=.2,
-                            bold=True, color=(.06, .45, .45, 1))
-
-            self.ids.label_preview.add_widget(deSales)
-
-            print(self.cart)
-            print(self.qty)
-            print(self.instock)
-            print(self.sold)
-
-            self.ids.qty_inp.text = str(pqty)
-            self.ids.price_inp.text = str(price.text)
-            self.ids.total_inp.text = str(pprice)
-
-    def updateList(self, cartName):
-        for k in range(len(self.cart)):
-            if self.cart[k] == cartName:
-                del self.cart[k]
-                del self.qty[k]
-                del self.instock[k]
-                del self.sold[k]
-                del self.total_list[k]
-                del self.totaled[k]
-                del self.totaled_out[k]
-
-                del self.cloud_cart[k]
-                del self.cloud_qty[k]
-                del self.cloud_price[k]
-                del self.cloud_date[k]
-
     # LOCAL DB UPDATE
-
     def test(self):
         if len(self.cart) == 0 or len(self.cart) != len(self.qty) or len(self.cart) != len(self.instock) or len(self.cart) != len(self.sold):
             self.notify.add_widget(
@@ -222,11 +234,13 @@ class OperatorWindow(BoxLayout):
             self.ids.products.clear_widgets()
         else:
             for j in range(len(self.cart)):
-                upd_instock = int(self.instock[j]) - int(self.qty[j])
+                p_name = self.stocks.find_one({"product_name": self.cart[j]})
+
+                upd_instock = int(p_name['in_stock']) - int(self.qty[j])
                 self.dbStock.append(upd_instock)
                 print('stock : ', self.dbStock)
 
-                upd_sold = int(self.sold[j]) + int(self.qty[j])
+                upd_sold = int(p_name['sold']) + int(self.qty[j])
                 self.dbSold.append(upd_sold)
                 print('sold : ', self.dbSold)
 
@@ -259,34 +273,6 @@ class OperatorWindow(BoxLayout):
             del self.totaled_out[::]
 
             self.ids.products.clear_widgets()
-
-    # CLOUD DB UPDATE
-    def cloud(self, url="www.cloud.mongodb.com", timeout=3):
-        conn = httplib.HTTPSConnection(url, timeout=timeout)
-        try:
-            conn.request("HEAD", "/")
-            # cloud db connection
-            cloud_client = MongoClient(
-                "mongodb+srv://cipher:cipher0@cluster0-crb4g.mongodb.net/<dbname>?retryWrites=true&w=majority")
-
-            self.cloud_db = cloud_client.get_database('medichris')
-            self.cloud_records = self.cloud_db.analysis
-            for i in range(len(self.cloud_cart)):
-                self.cloud_records.insert_one(
-                    {'product name': self.cloud_cart[i], 'quantity': self.cloud_qty[i], 'price': self.cloud_price[i], 'date': self.cloud_date[i]})
-
-            print(self.cloud_cart)
-
-            del self.cloud_cart[::]
-            del self.cloud_qty[::]
-            del self.cloud_price[::]
-            del self.cloud_date[::]
-
-            conn.close()
-            return True
-        except Exception as e:
-            print(e)
-            return False
 
     # Cancels Sales
     def cancel(self):

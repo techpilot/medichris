@@ -85,6 +85,7 @@ class AdminWindow(BoxLayout):
 
         for i in range(5):
             OTP += digits[math.floor(random.random() * 15)]
+            print(i)
         return OTP
 
     # ADD FIELDS
@@ -287,6 +288,11 @@ class AdminWindow(BoxLayout):
         else:
             self.users.remove({'user_name': user})
 
+            self.notify.add_widget(
+                Label(text='[color=#00FF00][b]Successfully Removed![/b][/color]', markup=True))
+            self.notify.open()
+            Clock.schedule_once(self.killswitch, 1)
+
         users = self.get_users()
         userstable = DataTable(table=users)
         content.add_widget(userstable)
@@ -302,6 +308,11 @@ class AdminWindow(BoxLayout):
         else:
             self.products.remove({'product_code': code})
 
+            self.notify.add_widget(
+                Label(text='[color=#00FF00][b]Successfully Removed!![/b][/color]', markup=True))
+            self.notify.open()
+            Clock.schedule_once(self.killswitch, 1)
+
         prodz = self.get_products()
         stocktable = DataTable(table=prodz)
         content.add_widget(stocktable)
@@ -309,7 +320,19 @@ class AdminWindow(BoxLayout):
     def remove_analysis(self, code):
         content = self.ids.analysis_res
         content.clear_widgets()
-        self.analysis.remove({'code': code})
+
+        if code == '':
+            self.notify.add_widget(
+                Label(text='[color=#FF0000][b]Product Code Required[/b][/color]', markup=True))
+            self.notify.open()
+            Clock.schedule_once(self.killswitch, 1)
+        else:
+            self.analysis.remove({'code': code})
+
+            self.notify.add_widget(
+                Label(text='[color=#00FF00][b]Successfully Removed!!![/b][/color]', markup=True))
+            self.notify.open()
+            Clock.schedule_once(self.killswitch, 1)
 
         analyse = self.get_analysis()
         ana_table = DataTable(table=analyse)
