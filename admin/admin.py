@@ -67,7 +67,7 @@ class AdminWindow(BoxLayout):
         product_code = []
         product_name = []
         spinvals = []
-        for product in self.products.find():
+        for product in self.products.find().sort("product_name"):
             product_code.append(product['product_code'])
             name = product['product_name']
             if len(name) > 30:
@@ -416,17 +416,17 @@ class AdminWindow(BoxLayout):
         db = client.db
         users = db.users
         _users = OrderedDict()
-        _users['first_names'] = {}
-        _users['last_names'] = {}
-        _users['user_names'] = {}
-        _users['passwords'] = {}
-        _users['designations'] = {}
+        _users['first_name'] = {}
+        _users['last_name'] = {}
+        _users['user_name'] = {}
+        _users['password'] = {}
+        _users['designation'] = {}
         first_names = []
         last_names = []
         user_names = []
         passwords = []
         designations = []
-        for user in users.find():
+        for user in users.find().sort("first_name"):
             first_names.append(user['first_name'])
             last_names.append(user['last_name'])
             user_names.append(user['user_name'])
@@ -439,11 +439,11 @@ class AdminWindow(BoxLayout):
         users_length = len(first_names)
         idx = 0
         while idx < users_length:
-            _users['first_names'][idx] = first_names[idx]
-            _users['last_names'][idx] = last_names[idx]
-            _users['user_names'][idx] = user_names[idx]
-            _users['passwords'][idx] = passwords[idx]
-            _users['designations'][idx] = designations[idx]
+            _users['first_name'][idx] = first_names[idx]
+            _users['last_name'][idx] = last_names[idx]
+            _users['user_name'][idx] = user_names[idx]
+            _users['password'][idx] = passwords[idx]
+            _users['designation'][idx] = designations[idx]
 
             idx += 1
 
@@ -468,7 +468,7 @@ class AdminWindow(BoxLayout):
         sold = []
         order = []
 
-        for product in products.find():
+        for product in products.find().sort("product_name"):
             product_code.append(product['product_code'])
             name = product['product_name']
             if len(name) > 10:
@@ -513,7 +513,9 @@ class AdminWindow(BoxLayout):
         date = []
         time = []
 
-        for analyse in analysis.find():
+        for analyse in analysis.find().sort([
+            ("sales_date", pymongo.DESCENDING),
+                ("time", pymongo.DESCENDING)]):
             code.append(analyse['code'])
             name = analyse['product_name']
             if len(name) > 13:
@@ -650,7 +652,9 @@ class AdminWindow(BoxLayout):
         sales_date = []
         time = []
 
-        for analyse in analysis.find({'product_name': name}):
+        for analyse in analysis.find({'product_name': name}).sort([
+            ("sales_date", pymongo.DESCENDING),
+                ("time", pymongo.DESCENDING)]):
             code.append(analyse['code'])
             name = analyse['product_name']
             if len(name) > 17:

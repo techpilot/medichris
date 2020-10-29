@@ -68,7 +68,7 @@ class OperatorWindow(BoxLayout):
         product_name = []
         product_qty = []
         spinvals = []
-        for product in self.stocks.find():
+        for product in self.stocks.find().sort("product_name"):
             product_price.append(product['product_price'])
             product_qty.append(product['in_stock'])
             name = product['product_name']
@@ -81,6 +81,10 @@ class OperatorWindow(BoxLayout):
                 [product_name[x], '$' + str(product_price[x]), str(product_qty[x])])
             spinvals.append(line)
         self.ids.target_product.values = spinvals
+
+        # target_product = self.ids.target_product.text
+        # name = target_product[:target_product.find(' >> ')]
+        # self.ids.code_inp.text = name
 
     def generateOTP(self):
         digits = "012345678957083"
@@ -186,6 +190,13 @@ class OperatorWindow(BoxLayout):
                 self.ids.qty_inp.text = str(pqty)
                 self.ids.price_inp.text = str(price.text)
                 self.ids.total_inp.text = str(pprice)
+
+    def doSales(self):
+        target_product = self.ids.target_product.text
+        name = target_product[:target_product.find(' >> ')]
+        self.ids.code_inp.text = name
+
+        return self.update_purchases()
 
     def updateList(self):
         if len(self.cart) == 0:

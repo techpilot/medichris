@@ -52,7 +52,7 @@
         height: 50
         canvas.before:
             Color:
-                rgba: (1, 1, 1, 1)
+                rgba: (.01,.01,.01,.01)
             Rectangle:
                 size: self.size
                 pos: self.pos
@@ -86,7 +86,7 @@
             id: refresh
             text: 'SELL'
             background_normal: ''
-            background_color: (.255, .99, .71, 255)
+            background_color: (1, 0, 1, 1)
             size_hint_x: .2
             bold: True
             on_release: root.test()
@@ -111,10 +111,6 @@
                         size: self.size
                         pos: self.pos
                 FlatButton:
-                    text: 'Qty'
-                    bold: True
-                    size_hint_x: .05
-                FlatButton:
                     text: 'Product name'
                     bold: True
                     size_hint_x: .25
@@ -123,24 +119,25 @@
                     bold: True
                     size_hint_x: .05
                 FlatButton:
-                    text: 'Product Total'
+                    text: 'Total'
                     bold: True
-                    size_hint_x: .15
+                    size_hint_x: .1
+                FlatButton:
+                    text: 'Qty'
+                    bold: True
+                    size_hint_x: .05
                 FlatButton:
                     text: ' '
                     size_hint_x: .35
+                FlatButton:
+                    text: ' '
+                    size_hint_x: .05
 
             BoxLayout:
                 id: product_inputs
                 size_hint_y: None
                 height: 30
                 spacing: 5
-                TextInput:
-                    id: qty_inp
-                    size_hint_x: .05
-                    input_filter: 'int'
-                    multiline: False
-                    on_text_validate: code_inp.focus = True
                 TextInput:
                     id: code_inp
                     size_hint_x: .25
@@ -151,13 +148,26 @@
                     size_hint_x: .05
                 TextInput:
                     id: total_inp
-                    size_hint_x: .15
+                    size_hint_x: .1
+                TextInput:
+                    id: qty_inp
+                    size_hint_x: .05
+                    input_filter: 'int'
+                    multiline: False
+                    on_text_validate: code_inp.focus = True
                 Spinner:
                     id: target_product
                     text: 'Choose Product'
                     background_color: (.06, .50, .50, 1)
                     size_hint_x: .35
                     on_state: root.filter_ana()
+                Button:
+                    id: do_sales
+                    text: 'Add'
+                    bold: True
+                    size_hint_x: .05
+                    background_color: (0, 0, 1, 1)
+                    on_release: root.doSales()
             BoxLayout:
                 id: id_to_cart
                 orientation: 'vertical'

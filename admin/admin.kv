@@ -24,9 +24,17 @@
                 size: self.size
                 pos: self.pos
         
+
+        Label:
+            text: 'Admin Dashboard'
+            font_name: 'alpha'
+            bold: True
+            size_hint: (.9,None)
+            height: 30
         FlatButton:
             id: close
             text: 'logout'
+            color: (0, 0, 1, 1)
             underline: True
             font_name: 'Pacifico'
             size_hint: (.05, None)
@@ -35,18 +43,12 @@
         FlatButton:
             id: close
             text: 'exit'
+            color: (1, 0, 0, 1)
             underline: True
             font_name: 'Pacifico'
             size_hint: (.05, None)
             height: 30
             on_release: Window.close()
-
-        Label:
-            text: 'Admin Dashboard'
-            font_name: 'alpha'
-            bold: True
-            size_hint: (.9,None)
-            height: 30
     BoxLayout:
         id: content_nav
         

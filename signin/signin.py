@@ -31,12 +31,12 @@ class SigninWindow(BoxLayout):
         info.text = ''
 
         if uname == '' or passw == '':
-            info.text = '[color=#FF0000]Username $ Password Required[/color]'
+            info.text = '[color=#FF0000]Username $ password required[/color]'
         else:
             user = users.find_one({'user_name': uname})
 
             if user == None:
-                info.text = '[color=#FF0000]Invalid Username or Password[/color]'
+                info.text = '[color=#FF0000]Invalid username or password[/color]'
             else:
                 passw = hashlib.sha256(passw.encode()).hexdigest()
                 if passw == user['password']:
@@ -48,7 +48,7 @@ class SigninWindow(BoxLayout):
                     else:
                         self.parent.parent.current = 'scrn_op'
                 else:
-                    info.text = '[color=#FF0000]Invalid Username or Password[/color]'
+                    info.text = '[color=#FF0000]Invalid username or password[/color]'
 
 
 class SigninApp(App):
