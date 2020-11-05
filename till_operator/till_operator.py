@@ -116,9 +116,9 @@ class OperatorWindow(BoxLayout):
             else:
                 if int(self.target_code['in_stock']) <= 0 or int(self.target_code['in_stock']) < int(self.ids.qty_inp.text):
                     self.notify.add_widget(
-                        Label(text='[color=#FF0000][b]Product stock is empty[/b][/color]', markup=True))
+                        Label(text='[color=#FF0000][b]It seems this product just finished[/b][/color]', markup=True))
                     self.notify.open()
-                    Clock.schedule_once(self.killswitch, 1)
+                    Clock.schedule_once(self.killswitch, 2)
                 else:
                     self.details = BoxLayout(size_hint_y=None, height=30,
                                              pos_hint={'top': 1})
