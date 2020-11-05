@@ -109,87 +109,93 @@ class OperatorWindow(BoxLayout):
         else:
             if self.target_code == None or not self.target_code:
                 self.notify.add_widget(
-                    Label(text='[color=#FF0000][b]Product Name Empty or Incorrect[/b][/color]', markup=True))
+                    Label(text='[color=#FF0000][b]Product name empty or incorrect[/b][/color]', markup=True))
                 self.notify.open()
                 Clock.schedule_once(self.killswitch, 1)
 
             else:
-                self.details = BoxLayout(size_hint_y=None, height=30,
-                                         pos_hint={'top': 1})
+                if int(self.target_code['in_stock']) <= 0 or int(self.target_code['in_stock']) < int(self.ids.qty_inp.text):
+                    self.notify.add_widget(
+                        Label(text='[color=#FF0000][b]Product stock is empty[/b][/color]', markup=True))
+                    self.notify.open()
+                    Clock.schedule_once(self.killswitch, 1)
+                else:
+                    self.details = BoxLayout(size_hint_y=None, height=30,
+                                             pos_hint={'top': 1})
 
-                products_container.add_widget(self.details)
+                    products_container.add_widget(self.details)
 
-                code = Label(text=self.target_code['product_code'], size_hint_x=.1,
-                             color=(.06, .45, .45, 1))
-                name = Label(text=self.pcode, bold=True,
-                             size_hint_x=.3, color=(.06, .45, .45, 1))
-                qty = Label(text=str(self.ids.qty_inp.text),
-                            size_hint_x=.1, color=(.06, .45, .45, 1))
-                price = Label(
-                    text=str(self.target_code['product_price']), size_hint_x=.1, color=(.06, .45, .45, 1))
+                    code = Label(text=self.target_code['product_code'], size_hint_x=.1,
+                                 color=(.06, .45, .45, 1))
+                    name = Label(text=self.pcode, bold=True,
+                                 size_hint_x=.3, color=(.06, .45, .45, 1))
+                    qty = Label(text=str(self.ids.qty_inp.text),
+                                size_hint_x=.1, color=(.06, .45, .45, 1))
+                    price = Label(
+                        text=str(self.target_code['product_price']), size_hint_x=.1, color=(.06, .45, .45, 1))
 
-                self.total1 = Label(text=str(float(price.text) * int(self.ids.qty_inp.text)), size_hint_x=.15,
-                                    color=(.06, .45, .45, 1))
-                undo = Label(
-                    text='Added', color=(.06, .45, .45, 1), size_hint_x=.25)
+                    self.total1 = Label(text=str(float(price.text) * int(self.ids.qty_inp.text)), size_hint_x=.15,
+                                        color=(.06, .45, .45, 1))
+                    undo = Label(
+                        text='Added', color=(.06, .45, .45, 1), size_hint_x=.25)
 
-                self.details.add_widget(code)
-                self.details.add_widget(name)
-                self.details.add_widget(qty)
-                self.details.add_widget(price)
-                self.details.add_widget(self.total1)
-                self.details.add_widget(undo)
+                    self.details.add_widget(code)
+                    self.details.add_widget(name)
+                    self.details.add_widget(qty)
+                    self.details.add_widget(price)
+                    self.details.add_widget(self.total1)
+                    self.details.add_widget(undo)
 
-                # Update Preview
-                pname = name.text
-                pprice = float(price.text) * int(self.ids.qty_inp.text)
-                pqty = str(self.ids.qty_inp.text)
+                    # Update Preview
+                    pname = name.text
+                    pprice = float(price.text) * int(self.ids.qty_inp.text)
+                    pqty = str(self.ids.qty_inp.text)
 
-                self.total += pprice
-                self.totaled.append(pprice)
-                self.totaled_out.append(sum(self.totaled))
-                print('total', self.totaled_out[-1])
+                    self.total += pprice
+                    self.totaled.append(pprice)
+                    self.totaled_out.append(sum(self.totaled))
+                    print('total', self.totaled_out[-1])
 
-                self.ids.cur_product.text = pname
-                self.ids.cur_price.text = str(pprice)
-                preview = self.ids.receipt_preview
-                prev_text = preview.text
-                _prev = prev_text.find('`')
-                if _prev > 0:
-                    prev_text = prev_text[:_prev]
+                    self.ids.cur_product.text = pname
+                    self.ids.cur_price.text = str(pprice)
+                    preview = self.ids.receipt_preview
+                    prev_text = preview.text
+                    _prev = prev_text.find('`')
+                    if _prev > 0:
+                        prev_text = prev_text[:_prev]
 
-                getStock = self.target_code['in_stock']
-                getSold = self.target_code['sold']
-                anaPrice = self.target_code['product_price']
+                    getStock = self.target_code['in_stock']
+                    getSold = self.target_code['sold']
+                    anaPrice = self.target_code['product_price']
 
-                # LOCAL LIST APPEMD
-                self.cart.append(self.pcode)
-                self.qty.append(self.ids.qty_inp.text)
-                self.instock.append(getStock)
-                self.sold.append(getSold)
-                self.ana_price_list.append(anaPrice)
-                self.total_list.append(self.total1.text)
+                    # LOCAL LIST APPEMD
+                    self.cart.append(self.pcode)
+                    self.qty.append(self.ids.qty_inp.text)
+                    self.instock.append(getStock)
+                    self.sold.append(getSold)
+                    self.ana_price_list.append(anaPrice)
+                    self.total_list.append(self.total1.text)
 
-                nu_preview = '\n'.join(
-                    [prev_text])
-                preview.text = nu_preview
+                    nu_preview = '\n'.join(
+                        [prev_text])
+                    preview.text = nu_preview
 
-                # TOTAL DISPLAY
-                self.ids.label_preview.clear_widgets()
+                    # TOTAL DISPLAY
+                    self.ids.label_preview.clear_widgets()
 
-                deSales = Label(text=str(self.totaled_out[-1]), font_name='alpha', size_hint_x=.2,
-                                bold=True, color=(.06, .45, .45, 1))
+                    deSales = Label(text=str(self.totaled_out[-1]), font_name='alpha', size_hint_x=.2,
+                                    bold=True, color=(.06, .45, .45, 1))
 
-                self.ids.label_preview.add_widget(deSales)
+                    self.ids.label_preview.add_widget(deSales)
 
-                print(self.cart)
-                print(self.qty)
-                print(self.instock)
-                print(self.sold)
+                    print(self.cart)
+                    print(self.qty)
+                    print(self.instock)
+                    print(self.sold)
 
-                self.ids.qty_inp.text = str(pqty)
-                self.ids.price_inp.text = str(price.text)
-                self.ids.total_inp.text = str(pprice)
+                    self.ids.qty_inp.text = str(pqty)
+                    self.ids.price_inp.text = str(price.text)
+                    self.ids.total_inp.text = str(pprice)
 
     def doSales(self):
         target_product = self.ids.target_product.text
@@ -230,7 +236,7 @@ class OperatorWindow(BoxLayout):
             print('Price List: ', self.ana_price_list)
 
             self.notify.add_widget(
-                Label(text='[color=#00FF00][b]Last Product Removed!![/b][/color]', markup=True))
+                Label(text='[color=#00FF00][b]Last product removed!![/b][/color]', markup=True))
             self.notify.open()
             Clock.schedule_once(self.killswitch, 1)
 
@@ -267,7 +273,7 @@ class OperatorWindow(BoxLayout):
                                          :16], 'code': self.generateOTP(), 'total': self.total_list[i], 'sales_date': str(datetime.now())[:10], 'month': str(datetime.now())[:7], 'time': str(datetime.now())[11:16]})
                 print(self.total_list[i])
             self.notify.add_widget(
-                Label(text='[color=#00FF00][b]Successful!!![/b][/color]', markup=True))
+                Label(text='[color=#00FF00][b]Transaction successful![/b][/color]', markup=True))
             self.notify.open()
             Clock.schedule_once(self.killswitch, 1)
 
